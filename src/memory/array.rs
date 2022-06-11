@@ -270,7 +270,7 @@ impl ArrayObject {
             // Exhaustively check bounds of arrays
             let device = CurrentContext::get_device()?;
 
-            let attr = |attr| Ok(1..=(device.get_attribute(attr)? as usize));
+            let attr = |attr| Ok::<_, CudaErrorCode>(1..=(device.get_attribute(attr)? as usize));
 
             let (description, bounds) = if descriptor.flags().contains(ArrayObjectFlags::CUBEMAP) {
                 if descriptor.flags().contains(ArrayObjectFlags::LAYERED) {

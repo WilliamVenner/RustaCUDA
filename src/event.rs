@@ -167,7 +167,7 @@ impl Event {
 
         match result {
             Ok(()) => Ok(EventStatus::Ready),
-            Err(CudaError::NotReady) => Ok(EventStatus::NotReady),
+            Err(code) if code == CudaError::NotReady => Err(CudaError::NotReady.into()),
             Err(other) => Err(other),
         }
     }
@@ -362,7 +362,7 @@ mod test {
         let _new_context = quick_init()?;
         let event = Event::new(EventFlags::DEFAULT)?;
         let result = event.record(&stream);
-        assert_eq!(result, Err(CudaError::InvalidHandle));
+        assert_eq!(result, Err(CudaError::InvalidHandle.into()));
         Ok(())
     }
 
@@ -381,7 +381,7 @@ mod test {
         fst_event.synchronize()?;
         snd_event.synchronize()?;
         let result = snd_event.elapsed_time_f32(&fst_event);
-        assert_eq!(result, Err(CudaError::InvalidHandle));
+        assert_eq!(result, Err(CudaError::InvalidHandle.into()));
         Ok(())
     }
 
@@ -415,7 +415,7 @@ mod test {
 
         stop_event.synchronize()?;
         let result = stop_event.elapsed_time_f32(&start_event);
-        assert_eq!(result, Err(CudaError::InvalidHandle));
+        assert_eq!(result, Err(CudaError::InvalidHandle.into()));
         Ok(())
     }
 }

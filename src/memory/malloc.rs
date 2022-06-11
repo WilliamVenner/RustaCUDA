@@ -40,7 +40,7 @@ use std::ptr;
 pub unsafe fn cuda_malloc<T>(count: usize) -> CudaResult<DevicePointer<T>> {
     let size = count.checked_mul(mem::size_of::<T>()).unwrap_or(0);
     if size == 0 {
-        return Err(CudaError::InvalidMemoryAllocation);
+        return Err(CudaError::InvalidMemoryAllocation.into());
     }
 
     let mut ptr: *mut c_void = ptr::null_mut();
@@ -85,7 +85,7 @@ pub unsafe fn cuda_malloc<T>(count: usize) -> CudaResult<DevicePointer<T>> {
 pub unsafe fn cuda_malloc_unified<T: DeviceCopy>(count: usize) -> CudaResult<UnifiedPointer<T>> {
     let size = count.checked_mul(mem::size_of::<T>()).unwrap_or(0);
     if size == 0 {
-        return Err(CudaError::InvalidMemoryAllocation);
+        return Err(CudaError::InvalidMemoryAllocation.into());
     }
 
     let mut ptr: *mut c_void = ptr::null_mut();
@@ -125,7 +125,7 @@ pub unsafe fn cuda_malloc_unified<T: DeviceCopy>(count: usize) -> CudaResult<Uni
 pub unsafe fn cuda_free<T>(mut p: DevicePointer<T>) -> CudaResult<()> {
     let ptr = p.as_raw_mut();
     if ptr.is_null() {
-        return Err(CudaError::InvalidMemoryAllocation);
+        return Err(CudaError::InvalidMemoryAllocation.into());
     }
 
     cuda_driver_sys::cuMemFree_v2(ptr as u64).to_result()?;
@@ -158,7 +158,7 @@ pub unsafe fn cuda_free<T>(mut p: DevicePointer<T>) -> CudaResult<()> {
 pub unsafe fn cuda_free_unified<T: DeviceCopy>(mut p: UnifiedPointer<T>) -> CudaResult<()> {
     let ptr = p.as_raw_mut();
     if ptr.is_null() {
-        return Err(CudaError::InvalidMemoryAllocation);
+        return Err(CudaError::InvalidMemoryAllocation.into());
     }
 
     cuda_driver_sys::cuMemFree_v2(ptr as u64).to_result()?;
@@ -199,7 +199,7 @@ pub unsafe fn cuda_free_unified<T: DeviceCopy>(mut p: UnifiedPointer<T>) -> Cuda
 pub unsafe fn cuda_malloc_locked<T>(count: usize) -> CudaResult<*mut T> {
     let size = count.checked_mul(mem::size_of::<T>()).unwrap_or(0);
     if size == 0 {
-        return Err(CudaError::InvalidMemoryAllocation);
+        return Err(CudaError::InvalidMemoryAllocation.into());
     }
 
     let mut ptr: *mut c_void = ptr::null_mut();
@@ -233,7 +233,7 @@ pub unsafe fn cuda_malloc_locked<T>(count: usize) -> CudaResult<*mut T> {
 /// ```
 pub unsafe fn cuda_free_locked<T>(ptr: *mut T) -> CudaResult<()> {
     if ptr.is_null() {
-        return Err(CudaError::InvalidMemoryAllocation);
+        return Err(CudaError::InvalidMemoryAllocation.into());
     }
 
     cuda_driver_sys::cuMemFreeHost(ptr as *mut c_void).to_result()?;
